@@ -11318,25 +11318,33 @@ function Show-Summary([string]$title,[int]$freedMB,[int]$ok,[int]$fail,$elapsed)
 }
 
 function Run-Mode([string]$mode){
-    Busy $true; $Summary.Visibility='Collapsed'; $Working.Visibility='Visible'; $StepPanel.Children.Clear()
-    $sel=@(if($mode -eq 'deep'){ $steps } else { $steps | Where-Object { $_.mode -eq 'quick' } })
-    $open=@(Get-OpenTargets)
-    if($open.Count -gt 0){ $w=Add-Row ("Apps abertas: "+($open -join ', ')) 'usa FECHAR APPS' $cAmber '!' }
-    $rows=@(); foreach($s in $sel){ $rows+=(Add-Row $s.n '' $cFaint) }
-    Flush
-    $t0=Get-Date; $before=FreeBytes; $ok=0; $fail=0
-    for($i=0;$i -lt $sel.Count;$i++){
-        $row=$rows[$i]; $row.Ico.Text=[char]0x25B6; $row.Ico.Foreground=$cCyan
-        $Bar.IsIndeterminate=$false; $Bar.Value=[math]::Round(($i/$sel.Count)*100)
-        $Status.Text="[$($i+1)/$($sel.Count)]  $($sel[$i].n)"; $row.Row.BringIntoView(); Flush
-        try{ $res=& $sel[$i].a; if(-not $res){$res='Concluido'}; $row.Ico.Text=[char]0x2713; $row.Ico.Foreground=$cGreen; $row.Dt.Text="$res"; $row.Dt.Foreground=$cGreen; $ok++ }
-        catch{ $row.Ico.Text=[char]0x2715; $row.Ico.Foreground=$cRed; $row.Dt.Text=("Falhou: "+$_.Exception.Message); $row.Dt.Foreground=$cRed; $fail++ }
-        $Bar.IsIndeterminate=$false; Flush
+    try{ if($sensorTimer){ $sensorTimer.Stop() } }catch{}
+    Busy $true
+    try{
+        $Summary.Visibility='Collapsed'; $Working.Visibility='Visible'; $StepPanel.Children.Clear()
+        $sel=@(if($mode -eq 'deep'){ $steps } else { $steps | Where-Object { $_.mode -eq 'quick' } })
+        $open=@(Get-OpenTargets)
+        if($open.Count -gt 0){ $w=Add-Row ("Apps abertas: "+($open -join ', ')) 'usa FECHAR APPS' $cAmber '!' }
+        $rows=@(); foreach($s in $sel){ $rows+=(Add-Row $s.n '' $cFaint) }
+        Flush
+        $t0=Get-Date; $before=FreeBytes; $ok=0; $fail=0
+        for($i=0;$i -lt $sel.Count;$i++){
+            $row=$rows[$i]; $row.Ico.Text=[char]0x25B6; $row.Ico.Foreground=$cCyan
+            $Bar.IsIndeterminate=$false; $Bar.Value=[math]::Round(($i/$sel.Count)*100)
+            $Status.Text="[$($i+1)/$($sel.Count)]  $($sel[$i].n)"; try{ $row.Row.BringIntoView() }catch{}; Flush
+            try{ $res=& $sel[$i].a; if(-not $res){$res='Concluido'}; $row.Ico.Text=[char]0x2713; $row.Ico.Foreground=$cGreen; $row.Dt.Text="$res"; $row.Dt.Foreground=$cGreen; $ok++ }
+            catch{ $row.Ico.Text=[char]0x2715; $row.Ico.Foreground=$cRed; $row.Dt.Text=("Falhou: "+$_.Exception.Message); $row.Dt.Foreground=$cRed; $fail++ }
+            $Bar.IsIndeterminate=$false; Flush
+        }
+        $Bar.Value=100; $freedMB=[math]::Round(((FreeBytes)-$before)/1MB); if($freedMB -lt 0){$freedMB=0}
+        $Working.Visibility='Collapsed'; $Status.Text='Concluido.'
+        Show-Summary 'OTIMIZACAO CONCLUIDA' $freedMB $ok $fail ((Get-Date)-$t0)
+    } catch {
+        try{ $Working.Visibility='Collapsed'; $Status.Text=('Erro na limpeza: '+$_.Exception.Message) }catch{}
+    } finally {
+        Busy $false
+        try{ if($sensorTimer){ $sensorTimer.Start() } }catch{}
     }
-    $Bar.Value=100; $freedMB=[math]::Round(((FreeBytes)-$before)/1MB); if($freedMB -lt 0){$freedMB=0}
-    $Working.Visibility='Collapsed'; $Status.Text='Concluido.'
-    Show-Summary 'OTIMIZACAO CONCLUIDA' $freedMB $ok $fail ((Get-Date)-$t0)
-    Busy $false
 }
 $Quick.Add_Click({ Run-Mode 'quick' })
 $Deep.Add_Click({ Run-Mode 'deep' })
@@ -11646,7 +11654,7 @@ function Show-UpdateDialog($remote){
     try{
         [xml]$ux=@"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Width="560" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Width="560" SizeToContent="Height" Topmost="True"
         WindowStartupLocation="CenterScreen" ShowInTaskbar="False" FontFamily="Segoe UI">
   <Border CornerRadius="16" BorderBrush="#FF7A1010" BorderThickness="1.4" Background="#FF0A0C10">
     <Border.Effect><DropShadowEffect Color="#FF000000" BlurRadius="30" ShadowDepth="0" Opacity="0.9"/></Border.Effect>
@@ -11678,6 +11686,7 @@ function Show-UpdateDialog($remote){
         $uYes.Add_Click({ $script:updYes=$true; $uw.Close() }.GetNewClosure())
         $uNo.Add_Click({ $script:updYes=$false; $uw.Close() }.GetNewClosure())
         try{ $uw.Owner=$win }catch{}
+        $uw.Add_Loaded({ try{ $uw.Activate(); $uw.Focus() }catch{} }.GetNewClosure())
         [void]$uw.ShowDialog()
         return $script:updYes
     }catch{
@@ -11714,7 +11723,7 @@ function Do-CheckUpdate($silent){
 }
 $upTimer=New-Object System.Windows.Threading.DispatcherTimer
 $upTimer.Interval=[TimeSpan]::FromSeconds(3)
-$upTimer.Add_Tick({ $upTimer.Stop(); Do-CheckUpdate $true })
+$upTimer.Add_Tick({ $upTimer.Stop(); $win.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background,[action]{ Do-CheckUpdate $true }) | Out-Null })
 $win.Add_Loaded({ $upTimer.Start() })
 
 $toolsMenu=New-Object System.Windows.Controls.ContextMenu
@@ -11756,6 +11765,8 @@ for($sv=72;$sv -le 94;$sv+=3){ Set-Splash $sv 'A ligar sensores...'; Start-Sleep
 Set-Splash 100 'Pronto'
 Start-Sleep -Milliseconds 170
 $win.Add_Closed({ [System.Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown() })
+# Rede de seguranca: nenhum erro nao capturado fecha o programa
+try{ [System.Windows.Threading.Dispatcher]::CurrentDispatcher.add_UnhandledException({ param($s,$e) try{ $Working.Visibility='Collapsed'; $Status.Text=('Aviso (recuperado): '+$e.Exception.Message); Busy $false }catch{}; $e.Handled=$true }) }catch{}
 $win.Show()
 $splash.Close()
 [System.Windows.Threading.Dispatcher]::Run()
