@@ -11640,7 +11640,7 @@ function Do-Schedule {
 function Do-Unschedule { try{ schtasks /Delete /TN 'Otim_LimpezaSemanal' /F 2>$null | Out-Null; $Status.Text='Agendamento removido.' }catch{ $Status.Text='nao havia agendamento.' } }
 
 # ===== ATUALIZACOES =====
-$APP_VERSION='1.0'
+$APP_VERSION='1.4'
 $UPDATE_MANIFEST='https://raw.githubusercontent.com/xF-18x/Cyber-Otimizador/main/version.json'
 try{ $VerTxt.Text=('v'+$APP_VERSION) }catch{}
 function Get-RemoteInfo { try{ [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; return Invoke-RestMethod -Uri $UPDATE_MANIFEST -TimeoutSec 8 -EA Stop }catch{ return $null } }
@@ -11710,14 +11710,31 @@ function Do-CheckUpdate($silent){
     if(Is-NewerVer $r.version){
         $Status.Text=('Atualizacao disponivel: v'+[string]$r.version)
         if(Show-UpdateDialog $r){
+            $Status.Text='A transferir atualizacao...'; Flush
             if(Download-Update $r){
                 $self=$env:OTIM_SELF
                 $hf=Join-Path $env:TEMP 'otim_update.cmd'
-                Set-Content -LiteralPath $hf -Value "@echo off`r`ntimeout /t 2 >nul`r`nmove /y `"$self.new`" `"$self`" >nul`r`nstart `"`" `"$self`"" -Encoding ASCII
+                $lines=@(
+                    '@echo off',
+                    "set ""SRC=$self.new""",
+                    "set ""DST=$self""",
+                    'set /a n=0',
+                    ':wait',
+                    'move /y "%SRC%" "%DST%" >nul 2>&1',
+                    'if not exist "%SRC%" goto done',
+                    'set /a n+=1',
+                    'if %n% geq 60 goto done',
+                    'timeout /t 1 >nul',
+                    'goto wait',
+                    ':done',
+                    'start "" "%DST%"',
+                    'del "%~f0" >nul 2>&1'
+                )
+                Set-Content -LiteralPath $hf -Value $lines -Encoding ASCII
                 Start-Process cmd.exe -ArgumentList '/c',$hf -WindowStyle Hidden
-                [System.Windows.MessageBox]::Show('Atualizacao transferida. O programa vai reiniciar.','Cyber Otimizador','OK','Information')|Out-Null
+                [System.Windows.MessageBox]::Show('Atualizacao transferida. O programa vai fechar e reabrir na versao nova.','Cyber Otimizador','OK','Information')|Out-Null
                 $win.Close()
-            } else { [System.Windows.MessageBox]::Show('Nao consegui transferir/validar a atualizacao.','Cyber Otimizador','OK','Warning')|Out-Null }
+            } else { $Status.Text='Falha ao transferir a atualizacao.'; [System.Windows.MessageBox]::Show('Nao consegui transferir/validar a atualizacao. Verifica a ligacao a internet e tenta outra vez.','Cyber Otimizador','OK','Warning')|Out-Null }
         }
     } else { if(-not $silent){ $Status.Text=('Ja tens a versao mais recente (v'+$APP_VERSION+').') } }
 }
@@ -11757,7 +11774,7 @@ try{
     $tmE=$tm.Items.Add('Sair'); $tmE.add_Click({ $script:tray.Visible=$false; $win.Close() })
     $script:tray.ContextMenuStrip=$tm
     $script:tray.add_MouseDoubleClick({ $win.Show(); $win.WindowState=[System.Windows.WindowState]::Normal; $win.Activate(); $script:tray.Visible=$false })
-    $win.Add_StateChanged({ if($win.WindowState -eq [System.Windows.WindowState]::Minimized){ $win.Hide(); if($script:tray){ $script:tray.Visible=$true } } })
+    # Minimizar normal para a barra de tarefas (sem esconder na bandeja)
     $win.Add_Closed({ try{ if($script:tray){ $script:tray.Visible=$false; $script:tray.Dispose() } }catch{} })
 }catch{}
 
