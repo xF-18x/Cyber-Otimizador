@@ -1,26 +1,26 @@
-# Cyber Otimizador do Sistema â€” by F-18
+# Cyber Otimizador do Sistema — by F-18
 
-Ferramenta portÃ¡til de limpeza e otimizaÃ§Ã£o do Windows, num Ãºnico ficheiro.
+Ferramenta portátil de limpeza e otimização do Windows, num único ficheiro.
 
 ## Funcionalidades
-- Limpeza profunda (temporÃ¡rios, cache, prefetch, DISM, etc.) â€” Modo RÃ¡pido e Modo Profundo
-- RemoÃ§Ã£o de bloatware e telemetria (reversÃ­vel)
-- Temperaturas ao vivo (CPU / GPU / Placa) com motor de sensores embutido
-- Uso de CPU / RAM / Rede em tempo real
-- GestÃ£o de **Processos** e teste de **LatÃªncia** com menu de aÃ§Ãµes
-- Boost **NITRO** (alto desempenho temporÃ¡rio)
-- **Ferramentas**: gestor de arranque, desinstalador, verificaÃ§Ã£o de saÃºde, repor rede, reiniciar Explorador, agendar limpeza automÃ¡tica
-- Minimiza para a bandeja com a temperatura do CPU
-- **AtualizaÃ§Ãµes automÃ¡ticas** atravÃ©s deste repositÃ³rio
 
-## Como usar
-Descarrega o `CyberOtimizador.bat` e faz duplo-clique. Ele pede permissÃµes de Administrador e abre a interface.
+* **Limpeza profunda** — ficheiros temporários, cache, Prefetch, DISM, entre outros, com **Modo Rápido** e **Modo Profundo**.
+* **Remoção de bloatware e telemetria** — com possibilidade de reversão.
+* **Monitorização de temperaturas em tempo real** — CPU, GPU e placa-mãe, através de um motor de sensores integrado.
+* **Monitorização em tempo real** — utilização de CPU, RAM e rede.
+* **Gestão de processos** e **teste de latência**, com menu de ações.
+* **Boost NITRO** — modo de alto desempenho temporário.
+* **Ferramentas**:
 
-## Criar versÃ£o .exe (opcional, com Ã­cone)
-Corre o `CRIAR_EXE.bat` no Windows (precisa de Internet Ã  primeira vez). Gera `CyberOtimizador.exe`, ficheiro Ãºnico com Ã­cone.
+  * Gestor de arranque;
+  * Desinstalador;
+  * Verificação de integridade do sistema;
+  * Reposição das configurações de rede;
+  * Reinício do Explorador do Windows;
+  * Agendamento de limpeza automática.
+* **Minimização para a bandeja do sistema**, com apresentação da temperatura da CPU.
+* **Atualizações automáticas** através deste repositório.
 
-## AtualizaÃ§Ãµes
-O programa consulta o `version.json` deste repositÃ³rio. Quando sai uma versÃ£o nova, aparece um aviso dentro do programa.
+## Como utilizar
 
----
-*Cyber Mercenarios Team*
+Descarrega o ficheiro `CyberOtimizador.bat` e faz duplo clique sobre ele. O programa irá solicitar **permissões de Administrador** e, de seguid
