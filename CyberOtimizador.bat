@@ -27,6 +27,7 @@ exit /b
 #  Otimizador do Sistema - GUI (WPF)  -  by F-18
 # ====================================================================
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
+$WarningPreference='SilentlyContinue'; $ProgressPreference='SilentlyContinue'
 try{ Add-Type -Namespace Native -Name Proc -MemberDefinition @"
 [System.Runtime.InteropServices.DllImport("ntdll.dll")] public static extern int NtSuspendProcess(System.IntPtr h);
 [System.Runtime.InteropServices.DllImport("ntdll.dll")] public static extern int NtResumeProcess(System.IntPtr h);
@@ -36,6 +37,10 @@ try{ Add-Type -Namespace Win32 -Name Shell -MemberDefinition @"
 [System.Runtime.InteropServices.DllImport("shell32.dll", SetLastError=true)]
 public static extern void SetCurrentProcessExplicitAppUserModelID([System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)] string AppID);
 "@; [Win32.Shell]::SetCurrentProcessExplicitAppUserModelID('F18.CyberOtimizador') }catch{}
+# Ajudante para esconder janelas (ex.: Limpeza de Disco)
+try{ Add-Type -Namespace Win32 -Name Wnd -MemberDefinition '[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool ShowWindow(System.IntPtr h, int c);' }catch{}
+# Ajudante para libertar memoria RAM (esvaziar working set)
+try{ Add-Type -Namespace Win32 -Name Mem -MemberDefinition '[System.Runtime.InteropServices.DllImport("psapi.dll")] public static extern bool EmptyWorkingSet(System.IntPtr h);' }catch{}
 
 function Flush {
     $f = New-Object System.Windows.Threading.DispatcherFrame
@@ -370,10 +375,11 @@ Set-Splash 36 'A montar interface...'
             </Grid>
 
             <StackPanel Grid.Row="3" Margin="16,4,6,14">
-              <UniformGrid Rows="1" Columns="3" Margin="0,0,0,8">
-                <Button x:Name="CloseApps" Content="FECHAR APPS" Height="44" Margin="4,0" FontSize="12"/>
-                <Button x:Name="Proc" Content="PROCESSOS" Height="44" Margin="4,0" FontSize="12"/>
-                <Button x:Name="Lat" Content="LATENCIA" Height="44" Margin="4,0" FontSize="12"/>
+              <UniformGrid Rows="1" Columns="4" Margin="0,0,0,8">
+                <Button x:Name="CloseApps" Content="FECHAR APPS" Height="44" Margin="3,0" FontSize="10.5"/>
+                <Button x:Name="Proc" Content="PROCESSOS" Height="44" Margin="3,0" FontSize="10.5"/>
+                <Button x:Name="RamClean" Content="RAM CLEANER" Height="44" Margin="3,0" FontSize="10.5"/>
+                <Button x:Name="Lat" Content="LATENCIA" Height="44" Margin="3,0" FontSize="10.5"/>
               </UniformGrid>
               <UniformGrid Rows="1" Columns="3">
                 <Button x:Name="Nitro" Content="START NITRO" Height="46" Margin="4,0" Style="{DynamicResource NitroOff}"/>
@@ -386,7 +392,7 @@ Set-Splash 36 'A montar interface...'
           <!-- Painel de temperaturas -->
           <Border Grid.Column="1" Margin="0,0,10,10" CornerRadius="10" Background="#FF0A1220" BorderBrush="#FF16324C" BorderThickness="1">
            <Grid>
-            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
               <StackPanel Margin="10,10">
                 <TextBlock Text="TEMPERATURAS" FontSize="12" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Center" Margin="0,0,0,10">
@@ -400,7 +406,19 @@ Set-Splash 36 'A montar interface...'
                 <TextBlock x:Name="VerTxt" Text="" FontSize="10" Foreground="#FF44566B" HorizontalAlignment="Center" Margin="0,3,0,0"/>
               </StackPanel>
             </ScrollViewer>
-            <Button x:Name="Tools" Grid.Row="1" Content="&#x2699;  FERRAMENTAS" Height="46" Margin="10,6,10,14" HorizontalAlignment="Stretch" Style="{DynamicResource ToolsBtn}"/>
+            <Border Grid.Row="1" Margin="10,4,10,0" CornerRadius="8" Background="#FF0B1524" BorderBrush="#FF16324C" BorderThickness="1" Padding="9,7">
+              <StackPanel>
+                <TextBlock Text="O MEU PC" FontSize="11.5" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Center" Margin="0,0,0,6">
+                  <TextBlock.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="9" ShadowDepth="0"/></TextBlock.Effect>
+                </TextBlock>
+                <TextBlock x:Name="PcCpu" Text="CPU: --" FontSize="10.5" Foreground="#FFBFD0DE" TextWrapping="Wrap"/>
+                <TextBlock x:Name="PcGpu" Text="GPU: --" FontSize="10.5" Foreground="#FFBFD0DE" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                <TextBlock x:Name="PcRam" Text="RAM: --" FontSize="10.5" Foreground="#FFBFD0DE" Margin="0,3,0,0"/>
+                <TextBlock x:Name="PcWin" Text="Sistema: --" FontSize="10.5" Foreground="#FFBFD0DE" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                <TextBlock x:Name="PcUp" Text="Ligado ha: --" FontSize="10.5" Foreground="#FFBFD0DE" Margin="0,3,0,0"/>
+              </StackPanel>
+            </Border>
+            <Button x:Name="Tools" Grid.Row="2" Content="&#x2699;  FERRAMENTAS" Height="46" Margin="10,12,10,14" HorizontalAlignment="Stretch" Style="{DynamicResource ToolsBtn}"/>
            </Grid>
           </Border>
         </Grid>
@@ -1219,6 +1237,7 @@ $TitleBar=&$c 'TitleBar'; $Min=&$c 'Min'; $Max=&$c 'Max'; $Exit=&$c 'Exit'
 $StepPanel=&$c 'StepPanel'; $Scroller=&$c 'Scroller'; $Summary=&$c 'Summary'; $SumTitle=&$c 'SumTitle'
 $Working=&$c 'Working'; $Status=&$c 'Status'; $Bar=&$c 'Bar'
 $CloseApps=&$c 'CloseApps'; $Proc=&$c 'Proc'; $Lat=&$c 'Lat'; $Nitro=&$c 'Nitro'; $Quick=&$c 'Quick'; $Deep=&$c 'Deep'; $Tools=&$c 'Tools'; $SysPanel=&$c 'SysPanel'; $VerTxt=&$c 'VerTxt'
+$RamClean=&$c 'RamClean'; $PcCpu=&$c 'PcCpu'; $PcGpu=&$c 'PcGpu'; $PcRam=&$c 'PcRam'; $PcWin=&$c 'PcWin'; $PcUp=&$c 'PcUp'
 $FreedBig=&$c 'FreedBig'; $FreedSub=&$c 'FreedSub'; $OkCount=&$c 'OkCount'; $FailCount=&$c 'FailCount'; $TimeVal=&$c 'TimeVal'
 $SeeList=&$c 'SeeList'; $SumExit=&$c 'SumExit'
 $TempPanel=&$c 'TempPanel'; $SrcTxt=&$c 'SrcTxt'
@@ -12116,7 +12135,7 @@ $CloseApps.Add_Click({
 $steps = @(
   @{ n='Temporarios do utilizador e do sistema'; mode='quick'; a={ Clear-Folder $env:TEMP; Clear-Folder $env:TMP; Clear-Folder "$env:LOCALAPPDATA\Temp"; Clear-Folder "$env:WINDIR\Temp"; 'Concluido' } },
   @{ n='Prefetch'; mode='quick'; a={ Clear-Folder "$env:WINDIR\Prefetch"; 'Concluido' } },
-  @{ n='Cache do Windows Update'; mode='quick'; a={ Stop-Service wuauserv,bits -Force -EA SilentlyContinue; Clear-Folder "$env:WINDIR\SoftwareDistribution\Download"; Start-Service wuauserv,bits -EA SilentlyContinue; 'Concluido' } },
+  @{ n='Cache do Windows Update'; mode='quick'; a={ sc.exe stop wuauserv 2>&1 | Out-Null; sc.exe stop bits 2>&1 | Out-Null; Start-Sleep -Milliseconds 900; Clear-Folder "$env:WINDIR\SoftwareDistribution\Download"; sc.exe start wuauserv 2>&1 | Out-Null; sc.exe start bits 2>&1 | Out-Null; 'Concluido' } },
   @{ n='Delivery Optimization'; mode='quick'; a={ Delete-DeliveryOptimizationCache -Force -EA SilentlyContinue; 'Concluido' } },
   @{ n='Miniaturas, icones e tipos de letra'; mode='quick'; a={ Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*.db","$env:LOCALAPPDATA\Microsoft\Windows\Explorer\iconcache_*.db" -EA SilentlyContinue | Remove-Item -Force -EA SilentlyContinue; 'Concluido' } },
   @{ n='Relatorios de erro e crash dumps'; mode='quick'; a={ Clear-Folder "$env:ProgramData\Microsoft\Windows\WER"; Clear-Folder "$env:LOCALAPPDATA\Microsoft\Windows\WER"; Clear-Folder "$env:LOCALAPPDATA\CrashDumps"; Remove-Item "$env:WINDIR\MEMORY.DMP" -Force -EA SilentlyContinue; Clear-Folder "$env:WINDIR\Minidump"; 'Concluido' } },
@@ -12126,7 +12145,8 @@ $steps = @(
   @{ n='Remover bloatware (apps inuteis)'; mode='deep'; a={ $apps=@('Microsoft.BingNews','Microsoft.BingWeather','Microsoft.BingFinance','Microsoft.BingSports','Microsoft.3DBuilder','Microsoft.Microsoft3DViewer','Microsoft.MicrosoftSolitaireCollection','Microsoft.MicrosoftOfficeHub','Microsoft.Office.OneNote','Microsoft.SkypeApp','Microsoft.GetHelp','Microsoft.Getstarted','Microsoft.WindowsFeedbackHub','Microsoft.WindowsMaps','Microsoft.Wallet','Microsoft.Messaging','Microsoft.MixedReality.Portal','Microsoft.People','Microsoft.Print3D','Microsoft.ZuneMusic','Microsoft.ZuneVideo','king.com.CandyCrushSaga','king.com.CandyCrushSodaSaga','Microsoft.Todos','Clipchamp.Clipchamp'); $r=0; foreach($x in $apps){ $pk=Get-AppxPackage -AllUsers $x -EA SilentlyContinue; if($pk){ $pk|Remove-AppxPackage -EA SilentlyContinue; $r++ }; Get-AppxProvisionedPackage -Online -EA SilentlyContinue | Where-Object { $_.DisplayName -eq $x } | Remove-AppxProvisionedPackage -Online -EA SilentlyContinue | Out-Null }; "$r apps removidas" } },
   @{ n='Desativar telemetria e diagnostico'; mode='deep'; a={ sc.exe stop DiagTrack *>$null; sc.exe config DiagTrack start= disabled *>$null; sc.exe stop dmwappushservice *>$null; sc.exe config dmwappushservice start= disabled *>$null; @('\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser','\Microsoft\Windows\Application Experience\ProgramDataUpdater','\Microsoft\Windows\Customer Experience Improvement Program\Consolidator','\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip') | ForEach-Object { schtasks /Change /TN $_ /Disable 2>$null | Out-Null }; reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f | Out-Null; $svc=Get-Service DiagTrack -EA SilentlyContinue; if($svc -and $svc.StartType -eq 'Disabled'){ 'Telemetria desativada' } else { 'Servico protegido pelo Windows; tarefas e politica aplicadas' } } },
   @{ n='Desativar Restauro do Sistema (permanente)'; mode='deep'; a={ vssadmin delete shadows /all /quiet 2>$null | Out-Null; try { Disable-ComputerRestore -Drive "$env:SystemDrive\" -EA Stop } catch {}; reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\SystemRestore" /v DisableSR /t REG_DWORD /d 1 /f | Out-Null; sc.exe config swprv start= disabled *>$null; 'Restauro desativado e pontos removidos' } },
-  @{ n='Limpeza de Disco automatica'; mode='deep'; a={ $keys=@('Active Setup Temp Folders','BranchCache','Downloaded Program Files','Internet Cache Files','Memory Dump Files','Old ChkDsk Files','Previous Installations','Recycle Bin','Service Pack Cleanup','Setup Log Files','System error memory dump files','System error minidump files','Temporary Files','Temporary Setup Files','Thumbnail Cache','Update Cleanup','Upgrade Discarded Files','Windows Defender','Windows Error Reporting Files','Windows ESD installation files','Windows Upgrade Log Files'); foreach($k in $keys){ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\$k" /v StateFlags0099 /t REG_DWORD /d 2 /f | Out-Null }; $p=Start-Process cleanmgr.exe -ArgumentList '/sagerun:99' -WindowStyle Hidden -PassThru -EA SilentlyContinue; if($p){ Wait-Proc $p 'Limpeza de Disco' }; 'Concluido' } },
+  @{ n='Cache de aplicacoes (Discord, Teams, Spotify, NVIDIA)'; mode='deep'; a={ $ap=@("$env:APPDATA\discord\Cache","$env:APPDATA\discord\Code Cache","$env:APPDATA\discord\GPUCache","$env:APPDATA\Microsoft\Teams\Cache","$env:APPDATA\Microsoft\Teams\GPUCache","$env:APPDATA\Microsoft\Teams\blob_storage","$env:LOCALAPPDATA\Spotify\Storage","$env:LOCALAPPDATA\Spotify\Data","$env:LOCALAPPDATA\Slack\Cache","$env:LOCALAPPDATA\NVIDIA\DXCache","$env:LOCALAPPDATA\NVIDIA\GLCache","$env:LOCALAPPDATA\NVIDIA Corporation\NV_Cache","$env:LOCALAPPDATA\D3DSCache"); $r=0; foreach($pp in $ap){ if(Test-Path -LiteralPath $pp){ Clear-Folder $pp; $r++ } }; "$r caches limpas" } },
+  @{ n='Limpeza de Disco automatica'; mode='deep'; a={ $keys=@('Active Setup Temp Folders','BranchCache','Downloaded Program Files','Internet Cache Files','Memory Dump Files','Old ChkDsk Files','Previous Installations','Recycle Bin','Service Pack Cleanup','Setup Log Files','System error memory dump files','System error minidump files','Temporary Files','Temporary Setup Files','Thumbnail Cache','Update Cleanup','Upgrade Discarded Files','Windows Defender','Windows Error Reporting Files','Windows ESD installation files','Windows Upgrade Log Files'); foreach($k in $keys){ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\$k" /v StateFlags0099 /t REG_DWORD /d 2 /f | Out-Null }; $p=Start-Process cleanmgr.exe -ArgumentList '/sagerun:99' -WindowStyle Hidden -PassThru -EA SilentlyContinue; if($p){ $Bar.IsIndeterminate=$true; $i=0; while(-not $p.HasExited){ foreach($cp in (Get-Process cleanmgr -EA SilentlyContinue)){ try{ if($cp.MainWindowHandle -ne 0){ [Win32.Wnd]::ShowWindow($cp.MainWindowHandle,0) | Out-Null } }catch{} }; $Status.Text=('Limpeza de Disco a processar'+('.'*(($i%4)+1))+' (aguarde)'); Flush; Start-Sleep -Milliseconds 120; $i++ }; $Bar.IsIndeterminate=$false }; 'Concluido' } },
   @{ n='Limpeza de componentes (DISM)'; mode='deep'; a={ $p=Start-Process dism.exe -ArgumentList '/online','/cleanup-image','/startcomponentcleanup' -WindowStyle Hidden -PassThru -EA SilentlyContinue; if($p){ Wait-Proc $p 'Limpeza de componentes'; "codigo $($p.ExitCode)" } else { 'Concluido' } } },
   @{ n='Reparacao da imagem do Windows (DISM)'; mode='deep'; a={ $p=Start-Process dism.exe -ArgumentList '/online','/cleanup-image','/restorehealth' -WindowStyle Hidden -PassThru -EA SilentlyContinue; if($p){ Wait-Proc $p 'Reparacao DISM'; "codigo $($p.ExitCode)" } else { 'Concluido' } } },
   @{ n='Verificacao de ficheiros do sistema (SFC)'; mode='deep'; a={ $p=Start-Process sfc.exe -ArgumentList '/scannow' -WindowStyle Hidden -PassThru -EA SilentlyContinue; if($p){ Wait-Proc $p 'Verificacao SFC'; "codigo $($p.ExitCode)" } else { 'Concluido' } } },
@@ -12314,6 +12334,38 @@ $Nitro.Add_Click({
 })
 $win.Add_Closed({ if($script:nitroOn){ if($script:nitroPrev){ powercfg /setactive $script:nitroPrev 2>$null | Out-Null }; try{ Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name ToastEnabled -Value 1 -Type DWord -EA SilentlyContinue }catch{}; foreach($id in $script:nitroPids){ try{ (Get-Process -Id $id -EA SilentlyContinue).PriorityClass='Normal' }catch{} } } })
 
+# ---------------- RAM CLEANER ----------------
+function Get-RamPct { try{ $os=Get-CimInstance Win32_OperatingSystem -EA Stop; if($os.TotalVisibleMemorySize){ return [int]((($os.TotalVisibleMemorySize-$os.FreePhysicalMemory)/$os.TotalVisibleMemorySize)*100) } }catch{}; return $null }
+$RamClean.Add_Click({
+    Busy $true; $Summary.Visibility='Collapsed'; $Working.Visibility='Visible'; $StepPanel.Children.Clear()
+    Add-Row 'Libertar memoria RAM' 'a esvaziar a memoria em uso de processos em 2o plano' $cCyan '*' | Out-Null
+    $Status.Text='A libertar RAM...'; $Bar.IsIndeterminate=$true; Flush
+    $before=Get-RamPct
+    $n=0
+    foreach($p in Get-Process -EA SilentlyContinue){ try{ if([Win32.Mem]::EmptyWorkingSet($p.Handle)){ $n++ } }catch{} }
+    Start-Sleep -Milliseconds 700; Flush
+    $after=Get-RamPct
+    $Bar.IsIndeterminate=$false
+    if($null -ne $before -and $null -ne $after){
+        $col=if($after -lt $before){$cGreen}else{$cAmber}
+        Add-Row 'Memoria em uso' ("{0}%  ->  {1}%" -f $before,$after) $col ([char]0x2713) | Out-Null
+    }
+    Add-Row 'Processos otimizados' ("$n") $cGreen ([char]0x2713) | Out-Null
+    Add-Row 'Nota' 'a RAM libertada volta a ser usada conforme abres programas (e normal)' $cFaint 'i' | Out-Null
+    $Working.Visibility='Collapsed'; $Status.Text=("RAM libertada em $n processos.")
+    try{ Update-System }catch{}
+    Busy $false
+})
+
+# ---------------- O MEU PC (resumo) ----------------
+function Load-PcInfo {
+    try{ $cpu=(Get-CimInstance Win32_Processor -EA SilentlyContinue | Select-Object -First 1).Name; if($cpu){ $PcCpu.Text='CPU: '+($cpu -replace '\s+',' ').Trim() } }catch{}
+    try{ $gpu=(Get-CimInstance Win32_VideoController -EA SilentlyContinue | Where-Object { $_.Name -and $_.Name -notmatch 'Basic|Remote|Meta|Parsec|Virtual' } | Select-Object -First 1).Name; if($gpu){ $PcGpu.Text='GPU: '+$gpu } }catch{}
+    try{ $cs=Get-CimInstance Win32_ComputerSystem -EA SilentlyContinue; if($cs.TotalPhysicalMemory){ $PcRam.Text=('RAM: {0} GB' -f [math]::Round($cs.TotalPhysicalMemory/1GB)) } }catch{}
+    try{ $os=Get-CimInstance Win32_OperatingSystem -EA SilentlyContinue; if($os){ $PcWin.Text='Sistema: '+([string]$os.Caption -replace 'Microsoft ',''); $up=(Get-Date)-$os.LastBootUpTime; $PcUp.Text=('Ligado ha: {0}d {1}h {2}m' -f $up.Days,$up.Hours,$up.Minutes) } }catch{}
+}
+$win.Add_Loaded({ $win.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background,[action]{ Load-PcInfo }) | Out-Null })
+
 # ================= FERRAMENTAS =================
 function Show-Startup {
     Busy $true; $Summary.Visibility='Collapsed'; $Working.Visibility='Visible'; $StepPanel.Children.Clear()
@@ -12499,7 +12551,7 @@ function Do-Schedule {
 function Do-Unschedule { try{ schtasks /Delete /TN 'Otim_LimpezaSemanal' /F 2>$null | Out-Null; $Status.Text='Agendamento removido.' }catch{ $Status.Text='nao havia agendamento.' } }
 
 # ===== ATUALIZACOES =====
-$APP_VERSION='2.4'
+$APP_VERSION='2.5'
 $UPDATE_MANIFEST='https://raw.githubusercontent.com/xF-18x/Cyber-Otimizador/main/version.json'
 try{ $VerTxt.Text=('v'+$APP_VERSION) }catch{}
 function Get-RemoteInfo { try{ [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; return Invoke-RestMethod -Uri $UPDATE_MANIFEST -TimeoutSec 8 -EA Stop }catch{ return $null } }

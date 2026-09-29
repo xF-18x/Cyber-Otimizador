@@ -1,7 +1,7 @@
 {
-  "version": "2.4",
+  "version": "2.5",
   "title": "A tua equipa favorita está a trazer uma nova atualização!",
-  "notes": "Novidades da versão 2.4:\n- O banner da equipa passa a estar embutido no programa (aparece no aviso de atualização sem depender da internet)",
+  "notes": "Novidades da versão 2.5:\n- Novo botão RAM CLEANER (liberta memória em uso na hora)\n- Painel \"O meu PC\" com CPU, GPU, RAM, sistema e tempo ligado\n- Limpeza profunda passa a limpar cache do Discord, Teams, Spotify, Slack e NVIDIA\n- Correções de estabilidade na limpeza (serviços e Limpeza de Disco a correr escondida)",
   "url": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberOtimizador.bat",
   "image": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberMercenarios_banner.png"
 }
