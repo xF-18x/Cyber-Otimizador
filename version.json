@@ -1,7 +1,7 @@
 {
-  "version": "2.0",
+  "version": "2.2",
   "title": "A tua equipa favorita está a trazer uma nova atualização!",
-  "notes": "Novidades da versão 2.0:\n- Ícone próprio na barra de tarefas e no Alt-Tab (adeus ícone do PowerShell)\n- Versão consolidada e estável, com todas as correções recentes (limpeza, agendamento, atualizações e temperaturas)",
+  "notes": "Novidades da versão 2.2:\n- O NITRO passa a mostrar tudo o que faz no ecrã (plano de energia, notificações e processos abrandados, com os nomes)\n- Cabeçalho neon animado quando o NITRO está ativo",
   "url": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberOtimizador.bat",
   "image": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberMercenarios_banner.png"
 }

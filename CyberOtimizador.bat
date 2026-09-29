@@ -31,6 +31,11 @@ try{ Add-Type -Namespace Native -Name Proc -MemberDefinition @"
 [System.Runtime.InteropServices.DllImport("ntdll.dll")] public static extern int NtSuspendProcess(System.IntPtr h);
 [System.Runtime.InteropServices.DllImport("ntdll.dll")] public static extern int NtResumeProcess(System.IntPtr h);
 "@ }catch{}
+# Identidade propria do processo -> a barra de tarefas usa o nosso icone (nao o do PowerShell)
+try{ Add-Type -Namespace Win32 -Name Shell -MemberDefinition @"
+[System.Runtime.InteropServices.DllImport("shell32.dll", SetLastError=true)]
+public static extern void SetCurrentProcessExplicitAppUserModelID([System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)] string AppID);
+"@; [Win32.Shell]::SetCurrentProcessExplicitAppUserModelID('F18.CyberOtimizador') }catch{}
 
 function Flush {
     $f = New-Object System.Windows.Threading.DispatcherFrame
@@ -1188,7 +1193,7 @@ IuZcfNcU+j+oYh/pheWVtjC/xBRcAPgSIJcAehZCPdg9Kk8rHVpzXWEAMle30D1IXLyy+0epkNjLlBbn
 b17NKn00Lv1fnh5FjswMWoIAJuYdI/o22JCdj1+FnIzOXWtfhQUyADkQsEZYvUUYDMgyvCfz0q+q8cSDgFWF/sDqzwIpfBGLagBmIfk/iXGoUeNxYR0A1nPL
 ENSoUaNGjRo1atSoUaPGguE/JdTLEZWIs28AAAAASUVORK5CYII=
 '@
-try{ $icoBytes=[Convert]::FromBase64String(($ICON_B64 -replace '\s','')); $icoMs=New-Object System.IO.MemoryStream(,$icoBytes); $icoBmp=New-Object System.Windows.Media.Imaging.BitmapImage; $icoBmp.BeginInit(); $icoBmp.StreamSource=$icoMs; $icoBmp.CacheOption=[System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad; $icoBmp.EndInit(); $win.Icon=$icoBmp }catch{}
+try{ $icoBytes=[Convert]::FromBase64String(($ICON_B64 -replace '\s','')); $icoMs=New-Object System.IO.MemoryStream(,$icoBytes); $icoBmp=New-Object System.Windows.Media.Imaging.BitmapImage; $icoBmp.BeginInit(); $icoBmp.StreamSource=$icoMs; $icoBmp.CacheOption=[System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad; $icoBmp.DecodePixelWidth=256; $icoBmp.DecodePixelHeight=256; $icoBmp.EndInit(); $win.Icon=$icoBmp }catch{}
 try{ $win.Title='Cyber Otimizador' }catch{}
 $c = { param($n) $win.FindName($n) }
 $TitleBar=&$c 'TitleBar'; $Min=&$c 'Min'; $Max=&$c 'Max'; $Exit=&$c 'Exit'
@@ -12234,24 +12239,54 @@ $Lat.Add_Click({
 })
 
 # ---------------- NITRO (perfil temporario de alto desempenho) ----------------
-$script:nitroOn=$false; $script:nitroPrev=$null; $script:nitroPids=@()
+$script:nitroOn=$false; $script:nitroPrev=$null; $script:nitroPids=@(); $script:nitroNames=@()
 $Nitro.Add_Click({
     if(-not $script:nitroOn){
+        $Summary.Visibility='Collapsed'; $Working.Visibility='Collapsed'; $StepPanel.Children.Clear()
+        # Cabecalho NEON a pulsar
+        $hdr=New-Object System.Windows.Controls.TextBlock
+        $hdr.Text=([char]0x26A1 + '  NITRO ATIVADO  ' + [char]0x26A1)
+        $hdr.FontSize=27; $hdr.FontWeight=[System.Windows.FontWeights]::Bold; $hdr.Foreground=$cCyan
+        $hdr.HorizontalAlignment=[System.Windows.HorizontalAlignment]::Center; $hdr.Margin=[System.Windows.Thickness]::new(0,12,0,16)
+        $glow=New-Object System.Windows.Media.Effects.DropShadowEffect
+        $glow.Color=[System.Windows.Media.Color]::FromRgb(0,229,255); $glow.ShadowDepth=0; $glow.BlurRadius=14
+        $hdr.Effect=$glow
+        $StepPanel.Children.Add($hdr)|Out-Null
+        try{
+            $anim=New-Object System.Windows.Media.Animation.DoubleAnimation
+            $anim.From=8; $anim.To=36
+            $anim.Duration=[System.Windows.Duration]::new([TimeSpan]::FromSeconds(0.9))
+            $anim.AutoReverse=$true; $anim.RepeatBehavior=[System.Windows.Media.Animation.RepeatBehavior]::Forever
+            $glow.BeginAnimation([System.Windows.Media.Effects.DropShadowEffect]::BlurRadiusProperty,$anim)
+        }catch{}
+        Add-Row 'O NITRO acelera o PC temporariamente para jogos e tarefas pesadas.' '' $cFaint 'i' | Out-Null; Flush
         try{ $act=(powercfg /getactivescheme) -join ' '; if($act -match '([0-9a-fA-F-]{36})'){ $script:nitroPrev=$Matches[1] } }catch{}
         powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c 2>$null | Out-Null
+        Add-Row 'Plano de energia' 'Alto Desempenho' $cGreen ([char]0x2713) | Out-Null; Flush
         try{ if(-not (Test-Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications')){ New-Item -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -EA SilentlyContinue | Out-Null }; Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name ToastEnabled -Value 0 -Type DWord -EA SilentlyContinue }catch{}
+        Add-Row 'Notificacoes' 'silenciadas' $cGreen ([char]0x2713) | Out-Null; Flush
         $me=$PID; $sid=(Get-Process -Id $PID).SessionId; $skip=@('System','Idle','csrss','wininit','winlogon','services','lsass','svchost','explorer','dwm','audiodg','powershell','conhost','fontdrvhost','SearchHost','StartMenuExperienceHost','ShellExperienceHost','ctfmon')
-        $script:nitroPids=@(); $n=0
+        $script:nitroPids=@(); $script:nitroNames=@(); $n=0
         foreach($p in Get-Process -EA SilentlyContinue){
-            try{ if($p.Id -ne $me -and $p.SessionId -eq $sid -and $p.MainWindowHandle -eq 0 -and ($skip -notcontains $p.ProcessName) -and $p.PriorityClass -eq 'Normal'){ $p.PriorityClass='BelowNormal'; $script:nitroPids+=$p.Id; $n++ } }catch{}
+            try{ if($p.Id -ne $me -and $p.SessionId -eq $sid -and $p.MainWindowHandle -eq 0 -and ($skip -notcontains $p.ProcessName) -and $p.PriorityClass -eq 'Normal'){ $p.PriorityClass='BelowNormal'; $script:nitroPids+=$p.Id; $script:nitroNames+=$p.ProcessName; $n++ } }catch{}
         }
-        $Nitro.Content='NITRO ATIVO'; $Status.Text="NITRO ligado: alto desempenho, notificacoes em silencio, $n processos abrandados."
+        Add-Row 'Processos em 2o plano abrandados' ("$n") $cAmber ([char]0x2713) | Out-Null
+        $uniq=@($script:nitroNames | Select-Object -Unique)
+        $shown=@($uniq | Select-Object -First 12)
+        foreach($nm in $shown){ Add-Row ('   '+[char]0x2022+' '+$nm) 'prioridade baixa' $cMuted ([char]0x25CF) | Out-Null }
+        $rest=$uniq.Count - $shown.Count
+        if($rest -gt 0){ Add-Row ('   ... e mais '+$rest) '' $cFaint '' | Out-Null }
+        Add-Row 'Carrega outra vez em NITRO para repor tudo ao normal.' '' $cFaint 'i' | Out-Null; Flush
+        $Nitro.Content='NITRO ATIVO'; $Status.Text=("NITRO ligado: alto desempenho, notificacoes em silencio, $n processos abrandados.")
         $script:nitroOn=$true
     } else {
         if($script:nitroPrev){ powercfg /setactive $script:nitroPrev 2>$null | Out-Null }
         try{ Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name ToastEnabled -Value 1 -Type DWord -EA SilentlyContinue }catch{}
         foreach($id in $script:nitroPids){ try{ $pp=Get-Process -Id $id -EA SilentlyContinue; if($pp){ $pp.PriorityClass='Normal' } }catch{} }
-        $script:nitroPids=@()
+        $script:nitroPids=@(); $script:nitroNames=@()
+        $StepPanel.Children.Clear()
+        Add-Row ([char]0x26A1+' NITRO DESLIGADO') 'tudo reposto ao normal' $cGreen ([char]0x2713) | Out-Null
+        Add-Row 'Plano de energia, notificacoes e prioridades repostos ao estado anterior.' '' $cFaint 'i' | Out-Null
         $Nitro.Content=[char]0x26A1+' NITRO'; $Status.Text='NITRO desligado: tudo reposto ao normal.'
         $script:nitroOn=$false
     }
@@ -12443,7 +12478,7 @@ function Do-Schedule {
 function Do-Unschedule { try{ schtasks /Delete /TN 'Otim_LimpezaSemanal' /F 2>$null | Out-Null; $Status.Text='Agendamento removido.' }catch{ $Status.Text='nao havia agendamento.' } }
 
 # ===== ATUALIZACOES =====
-$APP_VERSION='2.0'
+$APP_VERSION='2.2'
 $UPDATE_MANIFEST='https://raw.githubusercontent.com/xF-18x/Cyber-Otimizador/main/version.json'
 try{ $VerTxt.Text=('v'+$APP_VERSION) }catch{}
 function Get-RemoteInfo { try{ [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; return Invoke-RestMethod -Uri $UPDATE_MANIFEST -TimeoutSec 8 -EA Stop }catch{ return $null } }
