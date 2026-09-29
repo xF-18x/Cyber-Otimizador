@@ -1,7 +1,0 @@
-{
-  "version": "1.4",
-  "title": "A tua equipa favorita está a trazer uma nova atualização!",
-  "notes": "Novidades da versão 1.4:\n- Botão ATUALIZAR do popup agora funciona mesmo (substituição fiável do programa)\n- Minimizar volta a ir para a barra de tarefas (deixou de ir para o ícone oculto)\n- Limpeza profunda mais estável (já não fecha o programa)\n- Novo menu de agendamento: frequência, dias e hora\n- Botão MENU dos processos em azul neon com brilho\n- Menus escuros e correções no NITRO e nas temperaturas\n- Ficheiro único, com o motor de sensores embutido",
-  "url": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberOtimizador.bat",
-  "image": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberMercenarios_banner.png"
-}
