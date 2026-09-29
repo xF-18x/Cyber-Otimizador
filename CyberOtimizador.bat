@@ -96,7 +96,7 @@ Set-Splash 36 'A montar interface...'
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Cyber Otimizador" Height="700" Width="960"
+        Title="Cyber Otimizador" Height="768" Width="1050"
         WindowStartupLocation="CenterScreen" WindowStyle="None"
         AllowsTransparency="True" Background="Transparent"
         FontFamily="Segoe UI" ResizeMode="CanMinimize">
@@ -324,7 +324,7 @@ Set-Splash 36 'A montar interface...'
 
         <!-- Corpo: conteudo + painel de sensores -->
         <Grid Grid.Row="1">
-          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="188"/></Grid.ColumnDefinitions>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions>
 
           <!-- Coluna principal -->
           <Grid Grid.Column="0">
@@ -12551,7 +12551,7 @@ function Do-Schedule {
 function Do-Unschedule { try{ schtasks /Delete /TN 'Otim_LimpezaSemanal' /F 2>$null | Out-Null; $Status.Text='Agendamento removido.' }catch{ $Status.Text='nao havia agendamento.' } }
 
 # ===== ATUALIZACOES =====
-$APP_VERSION='2.5'
+$APP_VERSION='2.6'
 $UPDATE_MANIFEST='https://raw.githubusercontent.com/xF-18x/Cyber-Otimizador/main/version.json'
 try{ $VerTxt.Text=('v'+$APP_VERSION) }catch{}
 function Get-RemoteInfo { try{ [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; return Invoke-RestMethod -Uri $UPDATE_MANIFEST -TimeoutSec 8 -EA Stop }catch{ return $null } }
@@ -15444,59 +15444,44 @@ function Show-UpdateDialog($remote){
         if($remote.title){ $uHead.Text=[string]$remote.title }
         $uNotes.Text=(([string]$remote.notes) -replace '\\n',"`n")
         $uVer.Text=('Versao v'+[string]$remote.version)
-        $uYes.Add_Click({ $script:updYes=$true; $uw.Close() }.GetNewClosure())
-        $uNo.Add_Click({ $script:updYes=$false; $uw.Close() }.GetNewClosure())
+        $uYes.Add_Click({ try{ $uw.Close() }catch{}; Apply-Update $remote }.GetNewClosure())
+        $uNo.Add_Click({ try{ $uw.Close() }catch{} }.GetNewClosure())
         try{ $uw.Owner=$win }catch{}
-        $uw.Add_Loaded({ try{ $uw.Activate(); $uw.Focus() }catch{} }.GetNewClosure())
-        [void]$uw.ShowDialog()
-        return $script:updYes
+        $uw.Add_Loaded({ try{ $uw.Activate(); $uw.Topmost=$true; $uw.Focus() }catch{} }.GetNewClosure())
+        $script:upWin=$uw
+        $uw.Show()
     }catch{
-        $res=[System.Windows.MessageBox]::Show(("Nova versao v{0}.`n`n{1}`n`nAtualizar agora?" -f [string]$remote.version,[string]$remote.notes),'Cyber Otimizador','YesNo','Information'); return ("$res" -eq 'Yes')
+        if([System.Windows.MessageBox]::Show(("Nova versao v{0}.`n`n{1}`n`nAtualizar agora?" -f [string]$remote.version,[string]$remote.notes),'Cyber Otimizador','YesNo','Information') -eq 'Yes'){ Apply-Update $remote }
     }
 }
-function Download-Update($remote){
+function Apply-Update($remote){
     try{
-        $self=$env:OTIM_SELF; if(-not $self -or -not (Test-Path $self)){ return $false }
+        $Status.Text='A transferir atualizacao...'; try{ $Working.Visibility='Collapsed' }catch{}; Flush
+        $self=$env:OTIM_SELF
+        if(-not $self -or -not (Test-Path $self)){ [System.Windows.MessageBox]::Show('Nao encontrei o ficheiro do programa para atualizar.','Cyber Otimizador','OK','Warning')|Out-Null; $Status.Text='Atualizacao cancelada.'; return }
         [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
         $tmp="$self.new"
-        Invoke-WebRequest -Uri $remote.url -OutFile $tmp -UseBasicParsing -TimeoutSec 40 -EA Stop
+        Invoke-WebRequest -Uri ([string]$remote.url) -OutFile $tmp -UseBasicParsing -TimeoutSec 90 -EA Stop
+        $len=0; try{ $len=(Get-Item $tmp).Length }catch{}
         $head=(Get-Content -LiteralPath $tmp -TotalCount 1 -EA SilentlyContinue)
-        if((Get-Item $tmp).Length -lt 1000 -or ($head -notmatch 'echo off')){ Remove-Item $tmp -Force -EA SilentlyContinue; return $false }
-        return $true
-    }catch{ return $false }
+        if($len -lt 1000 -or ($head -notmatch 'echo off')){ Remove-Item $tmp -Force -EA SilentlyContinue; [System.Windows.MessageBox]::Show('A atualizacao transferida nao e valida. Tenta outra vez.','Cyber Otimizador','OK','Warning')|Out-Null; $Status.Text='Atualizacao invalida.'; return }
+        $hf=Join-Path $env:TEMP 'otim_update.cmd'
+        $lines=@('@echo off',"set ""SRC=$self.new""","set ""DST=$self""",'set /a n=0',':wait','move /y "%SRC%" "%DST%" >nul 2>&1','if not exist "%SRC%" goto done','set /a n+=1','if %n% geq 60 goto done','timeout /t 1 >nul','goto wait',':done','start "" "%DST%"','del "%~f0" >nul 2>&1')
+        Set-Content -LiteralPath $hf -Value $lines -Encoding ASCII
+        Start-Process cmd.exe -ArgumentList '/c',$hf -WindowStyle Hidden
+        [System.Windows.MessageBox]::Show('Atualizacao pronta! O programa vai fechar e reabrir na versao nova.','Cyber Otimizador','OK','Information')|Out-Null
+        $win.Close()
+    }catch{
+        try{ [System.Windows.MessageBox]::Show(('Nao consegui atualizar:'+[Environment]::NewLine+$_.Exception.Message),'Cyber Otimizador','OK','Warning')|Out-Null }catch{}
+        $Status.Text='Falha na atualizacao.'
+    }
 }
 function Do-CheckUpdate($silent){
     $r=Get-RemoteInfo
     if(-not $r){ if(-not $silent){ $Status.Text='Nao foi possivel verificar atualizacoes.' }; return }
     if(Is-NewerVer $r.version){
         $Status.Text=('Atualizacao disponivel: v'+[string]$r.version)
-        if(Show-UpdateDialog $r){
-            $Status.Text='A transferir atualizacao...'; Flush
-            if(Download-Update $r){
-                $self=$env:OTIM_SELF
-                $hf=Join-Path $env:TEMP 'otim_update.cmd'
-                $lines=@(
-                    '@echo off',
-                    "set ""SRC=$self.new""",
-                    "set ""DST=$self""",
-                    'set /a n=0',
-                    ':wait',
-                    'move /y "%SRC%" "%DST%" >nul 2>&1',
-                    'if not exist "%SRC%" goto done',
-                    'set /a n+=1',
-                    'if %n% geq 60 goto done',
-                    'timeout /t 1 >nul',
-                    'goto wait',
-                    ':done',
-                    'start "" "%DST%"',
-                    'del "%~f0" >nul 2>&1'
-                )
-                Set-Content -LiteralPath $hf -Value $lines -Encoding ASCII
-                Start-Process cmd.exe -ArgumentList '/c',$hf -WindowStyle Hidden
-                [System.Windows.MessageBox]::Show('Atualizacao transferida. O programa vai fechar e reabrir na versao nova.','Cyber Otimizador','OK','Information')|Out-Null
-                $win.Close()
-            } else { $Status.Text='Falha ao transferir a atualizacao.'; [System.Windows.MessageBox]::Show('Nao consegui transferir/validar a atualizacao. Verifica a ligacao a internet e tenta outra vez.','Cyber Otimizador','OK','Warning')|Out-Null }
-        }
+        Show-UpdateDialog $r
     } else { if(-not $silent){ $Status.Text=('Ja tens a versao mais recente (v'+$APP_VERSION+').') } }
 }
 $upTimer=New-Object System.Windows.Threading.DispatcherTimer
