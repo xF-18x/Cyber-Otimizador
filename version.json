@@ -1,7 +1,16 @@
 {
-  "version": "2.6",
+  "version": "2.7",
   "title": "A tua equipa favorita esta a trazer uma nova atualizacao!",
-  "notes": "Novidades da versao 2.6 Botao ATUALIZAR reescrito, com barra de progresso e passo a passo Cartao da REDE mostra agora Upload e Download separados Janela maior e sem barra de scroll nas temperaturas Inclui o RAM Cleaner, o painel O meu PC e a limpeza de cache de apps",
+  "notes": [
+    "Novidades da versao 2.7:",
+    "🌐 Limpeza dos navegadores mais completa: todos os perfis, Code Cache, GPUCache e Service Worker (Chrome, Edge, Brave, Opera, Vivaldi e Firefox)",
+    "🧹 Novo passo: logs antigos do Windows (CBS e DISM)",
+    "📦 Novo passo: sobras de atualizacoes do Windows (pastas de upgrade, Panther e INetCache)",
+    "🎮 Novo passo: caches de jogos (Steam, Epic e DirectX)",
+    "💾 Novo passo: desativar hibernacao para libertar espaco em disco",
+    "⚡ O botao RAM tambem escurece durante o processamento",
+    "🔒 README com explicacao sobre o aviso do antivirus"
+  ],
   "url": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberOtimizador.bat",
   "image": "https://github.com/xF-18x/Cyber-Otimizador/raw/main/CyberMercenarios_banner.png"
 }
