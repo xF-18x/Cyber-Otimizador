@@ -27,9 +27,9 @@ Cada um funciona sozinho, nao precisas de mais ficheiros.
 - 🔧 Ferramentas: gestor de arranque, desinstalador, verificacao de estado, reposicao de rede e agendamento de limpeza
 - 🔄 Atualizacoes automaticas na versao .bat
 
-## O antivirus avisou. E normal?
+## O antivirus avisou. É normal?
 
-Sim, e completamente normal. Este programa limpa ficheiros temporarios, cache
+Sim, é completamente normal. Este programa limpa ficheiros temporarios, cache
 e outras zonas internas do Windows, e ajusta algumas definicoes do sistema.
 Como mexe nesses sitios, alguns antivirus ficam "desconfiados" e podem marcar
 o programa como suspeito, mesmo nao havendo nada de mau. A isto chama-se um
