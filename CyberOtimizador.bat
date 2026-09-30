@@ -330,7 +330,14 @@ Set-Splash 36 'A montar interface...'
           <Grid Grid.Column="0">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="LIMPEZA  //  BLOATWARE  //  TELEMETRIA  //  REPARACAO  //  DISCO" FontSize="11" Foreground="#FFFF2D95" Margin="20,0,0,8"/>
+            <Border Grid.Row="0" Height="2" CornerRadius="1" Margin="18,6,12,12">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                  <GradientStop Color="#0000E5FF" Offset="0"/><GradientStop Color="#FF00E5FF" Offset="0.5"/><GradientStop Color="#0000E5FF" Offset="1"/>
+                </LinearGradientBrush>
+              </Border.Background>
+              <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.7"/></Border.Effect>
+            </Border>
 
             <Border Grid.Row="1" Margin="16,0,10,8" CornerRadius="10" Background="#FF0B1524" BorderBrush="#FF16324C" BorderThickness="1">
               <Grid>
@@ -362,14 +369,22 @@ Set-Splash 36 'A montar interface...'
             </Border>
 
             <Grid Grid.Row="2" Margin="18,0,10,8">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <TextBlock x:Name="Working" Grid.Row="0" Visibility="Collapsed" Text="A PROCESSAR - NAO FECHE A JANELA" FontWeight="Bold" FontSize="12.5" Foreground="#FF00E5FF" Margin="2,0,0,5">
+              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+              <Border Grid.Row="0" Height="2" CornerRadius="1" Margin="0,2,2,10">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#0000E5FF" Offset="0"/><GradientStop Color="#FF00E5FF" Offset="0.5"/><GradientStop Color="#0000E5FF" Offset="1"/>
+                  </LinearGradientBrush>
+                </Border.Background>
+                <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.7"/></Border.Effect>
+              </Border>
+              <TextBlock x:Name="Working" Grid.Row="1" Visibility="Collapsed" Text="A PROCESSAR - NAO FECHE A JANELA" FontWeight="Bold" FontSize="12.5" Foreground="#FF00E5FF" Margin="2,0,0,5">
                 <TextBlock.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="14" ShadowDepth="0"/></TextBlock.Effect>
               </TextBlock>
-              <TextBlock x:Name="Status" Grid.Row="2" Text="Seleciona um modo:" Foreground="#FFF2FFFF" FontWeight="Bold" FontSize="14.5" Margin="2,7,0,0">
+              <TextBlock x:Name="Status" Grid.Row="3" Text="Seleciona um modo:" Foreground="#FFF2FFFF" FontWeight="Bold" FontSize="14.5" Margin="2,7,0,0">
                 <TextBlock.Effect><DropShadowEffect Color="#FF9BF6FF" BlurRadius="4" ShadowDepth="0" Opacity="0.5"/></TextBlock.Effect>
               </TextBlock>
-              <ProgressBar x:Name="Bar" Grid.Row="1" Height="18" Minimum="0" Maximum="100" Value="0" Background="#FF0B1220" Foreground="#FF00E5FF" BorderBrush="#FF16324C" BorderThickness="1">
+              <ProgressBar x:Name="Bar" Grid.Row="2" Height="18" Minimum="0" Maximum="100" Value="0" Background="#FF0B1220" Foreground="#FF00E5FF" BorderBrush="#FF16324C" BorderThickness="1">
                 <ProgressBar.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="10" ShadowDepth="0"/></ProgressBar.Effect>
               </ProgressBar>
             </Grid>
@@ -378,7 +393,7 @@ Set-Splash 36 'A montar interface...'
               <UniformGrid Rows="1" Columns="4" Margin="0,0,0,8">
                 <Button x:Name="CloseApps" Content="FECHAR APPS" Height="44" Margin="3,0" FontSize="10.5"/>
                 <Button x:Name="Proc" Content="PROCESSOS" Height="44" Margin="3,0" FontSize="10.5"/>
-                <Button x:Name="RamClean" Content="RAM CLEANER" Height="44" Margin="3,0" FontSize="10.5"/>
+                <Button x:Name="RamClean" Content="RAM" Height="44" Margin="3,0" FontSize="10.5"/>
                 <Button x:Name="Lat" Content="LATENCIA" Height="44" Margin="3,0" FontSize="10.5"/>
               </UniformGrid>
               <UniformGrid Rows="1" Columns="3">
@@ -386,6 +401,30 @@ Set-Splash 36 'A montar interface...'
                 <Button x:Name="Quick" Content="MODO RAPIDO" Height="46" Margin="4,0"/>
                 <Button x:Name="Deep" Content="MODO PROFUNDO" Height="46" Margin="4,0"/>
               </UniformGrid>
+              <Grid Margin="0,8,0,0" Height="16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid Grid.Column="1">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Border Grid.Column="1" Height="2" VerticalAlignment="Bottom" CornerRadius="1" Margin="0,0,46,0" Background="#FF00E5FF">
+                    <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="7" ShadowDepth="0" Opacity="0.7"/></Border.Effect>
+                  </Border>
+                  <Border Grid.ColumnSpan="2" Width="2" Height="12" VerticalAlignment="Bottom" HorizontalAlignment="Center" CornerRadius="1" Background="#FF00E5FF">
+                    <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="7" ShadowDepth="0" Opacity="0.75"/></Border.Effect>
+                  </Border>
+                </Grid>
+                <Grid Grid.Column="2">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Border Grid.Column="0" Height="2" VerticalAlignment="Bottom" CornerRadius="1" Margin="46,0,0,0" Background="#FF00E5FF">
+                    <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="7" ShadowDepth="0" Opacity="0.7"/></Border.Effect>
+                  </Border>
+                  <Border Grid.ColumnSpan="2" Width="2" Height="12" VerticalAlignment="Bottom" HorizontalAlignment="Center" CornerRadius="1" Background="#FF00E5FF">
+                    <Border.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="7" ShadowDepth="0" Opacity="0.75"/></Border.Effect>
+                  </Border>
+                </Grid>
+                <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Text="LIMPEZA" FontSize="11.5" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-2">
+                  <TextBlock.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="12" ShadowDepth="0" Opacity="0.9"/></TextBlock.Effect>
+                </TextBlock>
+              </Grid>
             </StackPanel>
           </Grid>
 
@@ -1377,9 +1416,28 @@ $TC.mobo.Row.Visibility='Collapsed'
 $SC=@{}
 $SC.cpu=New-TempCard 'USO CPU'
 $SC.ram=New-TempCard 'USO RAM'
-$SC.net=New-TempCard 'REDE'
-foreach($k in 'cpu','ram','net'){ $SysPanel.Children.Add($SC[$k].Row)|Out-Null }
-$SC.net.Bar.Visibility='Collapsed'; $SC.net.Val.FontSize=13
+foreach($k in 'cpu','ram'){ $SysPanel.Children.Add($SC[$k].Row)|Out-Null }
+$netCardXaml=@"
+<Border xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#FF0B1524" CornerRadius="9" Padding="11,8" Margin="0,0,0,9">
+  <Grid>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <TextBlock Grid.Column="0" Text="REDE" FontSize="12" FontWeight="Bold" Foreground="#FF00E5FF" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,10,0"/>
+    <StackPanel Grid.Column="1">
+      <Grid Margin="0,0,0,5">
+        <TextBlock Text="Upload:" FontSize="10.5" Foreground="#FF7FB2C8" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <TextBlock x:Name="NetUp" Text="-- KB/s" FontSize="12" FontWeight="Bold" Foreground="#FF39FF9E" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+      </Grid>
+      <Grid>
+        <TextBlock Text="Download:" FontSize="10.5" Foreground="#FF7FB2C8" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <TextBlock x:Name="NetDown" Text="-- KB/s" FontSize="12" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+      </Grid>
+    </StackPanel>
+  </Grid>
+</Border>
+"@
+$netCard=[Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader ([xml]$netCardXaml)))
+$NetUp=$netCard.FindName('NetUp'); $NetDown=$netCard.FindName('NetDown')
+$SysPanel.Children.Add($netCard)|Out-Null
 $script:netPrev=$null
 function Set-UsePct($card,$v){
     if($null -eq $v){ $card.Val.Text='--'; return }
@@ -1393,7 +1451,8 @@ function Update-System {
     try{
         Set-UsePct $SC.cpu $script:sysData.cpu
         Set-UsePct $SC.ram $script:sysData.ram
-        if($script:sysData.net){ $SC.net.Val.Text=$script:sysData.net }
+        if($script:sysData.netUp){ $NetUp.Text=$script:sysData.netUp }
+        if($script:sysData.netDown){ $NetDown.Text=$script:sysData.netDown }
     }catch{}
 }
 
@@ -12092,7 +12151,7 @@ function Start-SysCollector {
                 try{
                     $rx=0;$tx=0; foreach($a in (Get-NetAdapterStatistics -EA SilentlyContinue)){ $rx+=[int64]$a.ReceivedBytes; $tx+=[int64]$a.SentBytes }
                     $now=Get-Date
-                    if($prev){ $dt=($now-$prev.T).TotalSeconds; if($dt -gt 0){ $dRx=[math]::Max(0,[int](($rx-$prev.Rx)/$dt/1KB)); $dTx=[math]::Max(0,[int](($tx-$prev.Tx)/$dt/1KB)); $SD.net=("D:{0} S:{1} KB/s" -f $dRx,$dTx) } }
+                    if($prev){ $dt=($now-$prev.T).TotalSeconds; if($dt -gt 0){ $dRx=[math]::Max(0,[int](($rx-$prev.Rx)/$dt/1KB)); $dTx=[math]::Max(0,[int](($tx-$prev.Tx)/$dt/1KB)); $SD.netUp=("{0} KB/s" -f $dTx); $SD.netDown=("{0} KB/s" -f $dRx) } }
                     $prev=@{ Rx=$rx; Tx=$tx; T=$now }
                 }catch{}
                 try{ $tz=Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature -EA Stop | Select-Object -First 1; if($tz){ $SD.fbcpu=[math]::Round(($tz.CurrentTemperature/10)-273.15,0) } }catch{}
@@ -12122,7 +12181,7 @@ $win.Add_Closed({ $sensorTimer.Stop(); try{ $script:sysCtl.stop=$true }catch{}; 
 # ---------------- Fechar apps 2o plano ----------------
 $targetProcs=@('Code','Discord','Steam','steamwebhelper','EpicGamesLauncher','Spotify','Teams','ms-teams','Slack','chrome','msedge','firefox','opera','brave','vivaldi','WhatsApp','Telegram','Zoom')
 function Get-OpenTargets { Get-Process -EA SilentlyContinue | Where-Object { $targetProcs -contains $_.ProcessName } | Select-Object -ExpandProperty ProcessName -Unique }
-function Busy([bool]$b){ foreach($x in @($CloseApps,$Proc,$Lat,$Quick,$Deep)){ $x.IsEnabled = -not $b } }
+function Busy([bool]$b){ foreach($x in @($CloseApps,$Proc,$RamClean,$Lat,$Quick,$Deep)){ $x.IsEnabled = -not $b } }
 
 $CloseApps.Add_Click({
     $before=@(Get-OpenTargets)
@@ -15405,10 +15464,44 @@ lBMhAOzIA5yR0/rU08iumFlcADIUHIJooosaPRFG6y+4Ku7p8oHFOjgAt/LYYDHoD0oopkjmmCoXb7wX
 o3mICOMAk96KKfQze49ykUZ+fJY8qOlRvJ5h67cDgmiihAyE5WQjOfTmlcEgkEAf3aKKfmSkDzDywrDPPGaLlTgEjJI45oopiIicgDGMdabmiimIUkHtQck4
 6UUUAA69aKKKAP/Z
 '@
+function Start-UpdateDownload {
+    try{
+        $script:upSt1.Visibility='Collapsed'; $script:upSt2.Visibility='Visible'
+        try{ $win.Hide() }catch{}
+        try{ Remove-Item -LiteralPath $script:upTmp -Force -EA SilentlyContinue }catch{}
+        [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
+        $wc=New-Object System.Net.WebClient
+        $wc.add_DownloadProgressChanged({ param($s,$e) try{ $script:upWin.Dispatcher.Invoke([action]{ $script:upBar.Value=$e.ProgressPercentage; $script:upPct.Text=("{0}%" -f $e.ProgressPercentage) }) }catch{} })
+        $wc.add_DownloadFileCompleted({ param($s,$e) try{ $script:upWin.Dispatcher.Invoke([action]{ Complete-UpdateDownload $e }) }catch{} })
+        $script:upWc=$wc
+        $wc.DownloadFileAsync((New-Object System.Uri($script:upUrl)), $script:upTmp)
+    }catch{
+        try{ [System.Windows.MessageBox]::Show(('Erro ao transferir:'+[Environment]::NewLine+$_.Exception.Message),'Cyber Otimizador','OK','Warning')|Out-Null }catch{}
+        try{ $win.Show() }catch{}; try{ $script:upWin.Close() }catch{}
+    }
+}
+function Complete-UpdateDownload($e){
+    try{
+        if($e -and $e.Error){ [System.Windows.MessageBox]::Show(('Nao consegui transferir:'+[Environment]::NewLine+$e.Error.Message),'Cyber Otimizador','OK','Warning')|Out-Null; try{ $win.Show() }catch{}; try{ $script:upWin.Close() }catch{}; return }
+        $len=0; try{ $len=(Get-Item $script:upTmp).Length }catch{}
+        $head=(Get-Content -LiteralPath $script:upTmp -TotalCount 1 -EA SilentlyContinue)
+        if($len -lt 1000 -or ($head -notmatch 'echo off')){ try{ Remove-Item -LiteralPath $script:upTmp -Force -EA SilentlyContinue }catch{}; [System.Windows.MessageBox]::Show('A atualizacao transferida nao e valida. Tenta outra vez.','Cyber Otimizador','OK','Warning')|Out-Null; try{ $win.Show() }catch{}; try{ $script:upWin.Close() }catch{}; return }
+        $script:upBar.Value=100; $script:upPct.Text='100%'
+        $script:upSt2.Visibility='Collapsed'; $script:upSt3.Visibility='Visible'
+    }catch{}
+}
+function Finish-Update {
+    try{
+        $self=$env:OTIM_SELF
+        $hf=Join-Path $env:TEMP 'otim_update.cmd'
+        $lines=@('@echo off',"set ""SRC=$self.new""","set ""DST=$self""",'set /a n=0',':wait','move /y "%SRC%" "%DST%" >nul 2>&1','if not exist "%SRC%" goto done','set /a n+=1','if %n% geq 60 goto done','timeout /t 1 >nul','goto wait',':done','start "" "%DST%"','del "%~f0" >nul 2>&1')
+        Set-Content -LiteralPath $hf -Value $lines -Encoding ASCII
+        Start-Process cmd.exe -ArgumentList '/c',$hf -WindowStyle Hidden
+    }catch{}
+    try{ $script:upWin.Close() }catch{}
+    try{ $win.Close() }catch{}
+}
 function Show-UpdateDialog($remote){
-    $script:updYes=$false
-    # Banner EMBUTIDO no programa (nao depende da internet)
-    $imgFile=Join-Path $env:TEMP 'cyber_banner.png'; $hasImg=$false
     try{
         [xml]$ux=@"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -15423,7 +15516,7 @@ function Show-UpdateDialog($remote){
       </TextBlock>
       <TextBlock x:Name="Notes" Text="" FontSize="12.5" Foreground="#FFBFD0DE" TextWrapping="Wrap" TextAlignment="Center" Margin="24,2,24,4"/>
       <TextBlock x:Name="Ver" Text="" FontSize="11.5" Foreground="#FF7FB2C8" HorizontalAlignment="Center" Margin="0,0,0,14"/>
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+      <StackPanel x:Name="St1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
         <Button x:Name="Yes" Content="ATUALIZAR AGORA" Width="180" Height="44" Margin="6,0" Foreground="#FFFFFFFF" FontWeight="Bold" Cursor="Hand">
           <Button.Template><ControlTemplate TargetType="Button"><Border CornerRadius="8" BorderThickness="0"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#FFE00000" Offset="0"/><GradientStop Color="#FF7A0000" Offset="1"/></LinearGradientBrush></Border.Background><Border.Effect><DropShadowEffect Color="#FFE00000" BlurRadius="14" ShadowDepth="0"/></Border.Effect><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
         </Button>
@@ -15431,24 +15524,44 @@ function Show-UpdateDialog($remote){
           <Button.Template><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="8" BorderBrush="#FF26384C" BorderThickness="1"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
         </Button>
       </StackPanel>
+      <StackPanel x:Name="St2" Visibility="Collapsed" Margin="30,0,30,22">
+        <TextBlock x:Name="DlText" Text="A transferir a nova versao..." FontSize="13" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Center" Margin="0,0,0,9"/>
+        <ProgressBar x:Name="DlBar" Height="18" Minimum="0" Maximum="100" Value="0" Background="#FF0B1220" Foreground="#FF00E5FF" BorderBrush="#FF26384C" BorderThickness="1">
+          <ProgressBar.Effect><DropShadowEffect Color="#FF00E5FF" BlurRadius="12" ShadowDepth="0"/></ProgressBar.Effect>
+        </ProgressBar>
+        <TextBlock x:Name="DlPct" Text="0%" FontSize="12.5" FontWeight="Bold" Foreground="#FF00E5FF" HorizontalAlignment="Center" Margin="0,7,0,0"/>
+      </StackPanel>
+      <StackPanel x:Name="St3" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,2,0,22">
+        <TextBlock Text="Nova versao pronta!" FontSize="16" FontWeight="Bold" Foreground="#FF39FF9E" HorizontalAlignment="Center" Margin="0,0,0,11">
+          <TextBlock.Effect><DropShadowEffect Color="#FF39FF9E" BlurRadius="14" ShadowDepth="0"/></TextBlock.Effect>
+        </TextBlock>
+        <Button x:Name="Open" Content="ABRIR NOVA VERSAO" Width="240" Height="48" Foreground="#FFFFFFFF" FontWeight="Bold" FontSize="14" Cursor="Hand">
+          <Button.Template><ControlTemplate TargetType="Button"><Border CornerRadius="9" BorderThickness="0"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#FF19D06B" Offset="0"/><GradientStop Color="#FF0A7A3E" Offset="1"/></LinearGradientBrush></Border.Background><Border.Effect><DropShadowEffect Color="#FF19D06B" BlurRadius="16" ShadowDepth="0"/></Border.Effect><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template>
+        </Button>
+      </StackPanel>
     </StackPanel>
   </Border>
 </Window>
 "@
         $uw=[Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $ux))
-        $uImg=$uw.FindName('Img'); $uHead=$uw.FindName('Head'); $uNotes=$uw.FindName('Notes'); $uVer=$uw.FindName('Ver'); $uYes=$uw.FindName('Yes'); $uNo=$uw.FindName('No')
+        $uImg=$uw.FindName('Img'); $uHead=$uw.FindName('Head'); $uNotes=$uw.FindName('Notes'); $uVer=$uw.FindName('Ver')
+        $uYes=$uw.FindName('Yes'); $uNo=$uw.FindName('No'); $uOpen=$uw.FindName('Open')
         $imgOk=$false
         try{ $bnBytes=[Convert]::FromBase64String(($BANNER_B64 -replace '\s','')); $bnMs=New-Object System.IO.MemoryStream(,$bnBytes); $bnBmp=New-Object System.Windows.Media.Imaging.BitmapImage; $bnBmp.BeginInit(); $bnBmp.StreamSource=$bnMs; $bnBmp.CacheOption=[System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad; $bnBmp.EndInit(); $uImg.Source=$bnBmp; $imgOk=$true }catch{}
-        if(-not $imgOk -and $hasImg){ try{ $bmp=New-Object System.Windows.Media.Imaging.BitmapImage; $bmp.BeginInit(); $bmp.CacheOption=[System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad; $bmp.UriSource=New-Object System.Uri($imgFile); $bmp.EndInit(); $uImg.Source=$bmp; $imgOk=$true }catch{} }
         if(-not $imgOk){ $uImg.Visibility='Collapsed' }
         if($remote.title){ $uHead.Text=[string]$remote.title }
         $uNotes.Text=(([string]$remote.notes) -replace '\\n',"`n")
         $uVer.Text=('Versao v'+[string]$remote.version)
-        $uYes.Add_Click({ try{ $uw.Close() }catch{}; Apply-Update $remote }.GetNewClosure())
-        $uNo.Add_Click({ try{ $uw.Close() }catch{} }.GetNewClosure())
-        try{ $uw.Owner=$win }catch{}
-        $uw.Add_Loaded({ try{ $uw.Activate(); $uw.Topmost=$true; $uw.Focus() }catch{} }.GetNewClosure())
         $script:upWin=$uw
+        $script:upUrl=[string]$remote.url
+        $script:upTmp=($env:OTIM_SELF + '.new')
+        $script:upBar=$uw.FindName('DlBar'); $script:upPct=$uw.FindName('DlPct'); $script:upText=$uw.FindName('DlText')
+        $script:upSt1=$uw.FindName('St1'); $script:upSt2=$uw.FindName('St2'); $script:upSt3=$uw.FindName('St3')
+        $uNo.Add_Click({ try{ $script:upWin.Close() }catch{} })
+        $uYes.Add_Click({ Start-UpdateDownload })
+        $uOpen.Add_Click({ Finish-Update })
+        try{ $uw.Owner=$win }catch{}
+        $uw.Add_Loaded({ try{ $script:upWin.Activate(); $script:upWin.Topmost=$true; $script:upWin.Focus() }catch{} })
         $uw.Show()
     }catch{
         if([System.Windows.MessageBox]::Show(("Nova versao v{0}.`n`n{1}`n`nAtualizar agora?" -f [string]$remote.version,[string]$remote.notes),'Cyber Otimizador','YesNo','Information') -eq 'Yes'){ Apply-Update $remote }

@@ -1,30 +1,33 @@
-# Cyber Otimizador do Sistema — by F-18
+# Cyber Otimizador do Sistema - by F-18
 
-Ferramenta portátil de limpeza e otimização do Windows.
+Ferramenta portatil de limpeza e otimizacao do Windows.
 
-## ⬇️ Descarregar
+## Descarregar
 
-Vai à página de **Releases** e escolhe a opção que preferes:
+Na pagina de Releases escolhe a opcao que preferes:
 
-👉 **https://github.com/xF-18x/Cyber-Otimizador/releases/latest**
+https://github.com/xF-18x/Cyber-Otimizador/releases/latest
 
-- **CyberOtimizador.bat** — versão portátil. Um único ficheiro, corre logo com duplo clique. Não precisa de mais nada.
-- **CyberOtimizador.exe** — o mesmo programa como aplicação com ícone próprio.
+- CyberOtimizador.bat: versao portatil, um unico ficheiro, corre com duplo clique.
+- CyberOtimizador.exe: o mesmo programa como aplicacao com icone proprio.
 
-Cada um funciona sozinho — não precisas de descarregar mais ficheiros.
+Cada um funciona sozinho, nao precisas de mais ficheiros.
 
 ## Funcionalidades
-- Limpeza profunda: ficheiros temporários, cache, prefetch, componentes do Windows (DISM), com Modo Rápido e Modo Profundo
-- Remoção de aplicações desnecessárias e telemetria (reversível)
-- Temperaturas em tempo real (CPU, GPU e placa-mãe)
-- Utilização de CPU, memória e rede em tempo real
-- Gestão de processos e teste de latência, com menu de ações
-- Modo NITRO (alto desempenho temporário)
-- Ferramentas: gestor de arranque, desinstalador, verificação de estado, reposição de rede, reiniciar o Explorador e agendamento de limpeza automática
-- Atualizações automáticas (na versão .bat)
 
-## Atualizações
-A versão **.bat** avisa-te automaticamente dentro do programa quando existe uma versão nova, com as novidades.
+- Limpeza profunda: temporarios, cache, prefetch, componentes do Windows (DISM), com Modo Rapido e Modo Profundo
+- Remocao de aplicacoes desnecessarias e telemetria (reversivel)
+- Temperaturas em tempo real (CPU, GPU e placa-mae)
+- Utilizacao de CPU, memoria e rede em tempo real
+- RAM Cleaner para libertar memoria na hora
+- Gestao de processos e teste de latencia
+- Modo NITRO (alto desempenho temporario)
+- Ferramentas: gestor de arranque, desinstalador, verificacao de estado, reposicao de rede e agendamento de limpeza
+- Atualizacoes automaticas na versao .bat
+
+## Atualizacoes
+
+A versao .bat avisa automaticamente dentro do programa quando existe uma versao nova.
 
 ---
-*Cyber Mercenarios Team*
+Cyber Mercenarios Team
